@@ -1,23 +1,53 @@
-APPROACH
+# Project Notes
 
-I identified that we are creating the token on backend but not using/storing it properly on frontend for authorization for other routes.
-I started by backtracking the backend to understand which API is returning the token and from there I determined that /login route does the task. 
-On the frontend I stored that token in localstorage for faster and global access. It can be refined by implementing global state management like REDUX in a full feldge application but for time being LocalStorage does it work.
-This solved the first 2 BASIC tasks
+## Overview
 
-Kept a check to make sure we show proper alerts on error while registering. Error handling as well 
+This document outlines the approach and key functionalities implemented in the project. It covers authentication token management, error handling, logout functionality, API service integration, and audio transcription using MediaRecorder API and openAI library.
 
-Logout functionality:
-It was a simple process of simply resetting the token and redirecting the user to main page. 
+## Approach
 
+### Authentication Token Management
 
-For Look at the APIService.ts file in the frontend services folder. Reimplement all network requests in the frontend to use this service, so that the app-version header is sent with every single request.
- - Refactored the APIService.ts with few adjustments based on changes made
- -  refactor my existing network requests throughout my application to use APIService.request() method
+1. **Backend Token Generation**: Identified token creation at `/login` API.
+   
+2. **Frontend Token Handling**: Stored token in `localStorage` for global access. Future enhancement could involve global state management (e.g., Redux).
 
-Resources used so far:
-- StackOverflow
-- MUI (https://mui.com/) [Installation command: npm install @mui/material @emotion/react @emotion/styled @mui/icons-material]
+### Error Handling
 
+- Implemented alerts for registration errors to improve user feedback.
 
-All the functionalities are implemented 
+### Logout Functionality
+
+- Implemented token reset and redirection to main page on logout.
+
+### API Service Integration
+
+- Refactored `APIService.ts` to ensure `app-version` header sent with each request.
+- Updated all network requests to use `APIService.request()` method for consistency.
+
+### Audio Transcription
+
+- Utilized MediaRecorder API on frontend for audio recording.
+- Integrated openAI library on backend for accurate audio-to-text transcription.
+
+## Resources
+
+- **StackOverflow**: Used for troubleshooting and solutions.
+- **Material-UI (MUI)**: UI framework for frontend components. Installation command: `npm install @mui/material @emotion/react @emotion/styled @mui/icons-material`.
+
+## Implementation Status
+
+All planned functionalities have been successfully implemented.
+
+## Future Improvements
+
+- Implement comprehensive state management (e.g., Redux) for better scalability.
+- Enhance UI/UX with additional features and optimizations.
+
+---
+
+![Before Image](before.png)
+*Figure 1: A motto that will be replaced after recoding*
+
+![After Diagram](after.png)
+*Figure 2: Recorded audio replace with motto*
