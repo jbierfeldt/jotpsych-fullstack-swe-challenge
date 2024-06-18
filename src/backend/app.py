@@ -65,7 +65,7 @@ def create_app():
     def user():
         current_user = get_jwt_identity()
         user = User.query.filter_by(username=current_user['username']).first()
-        return jsonify({'user': {'username': user.username, 'motto': user.motto}}), 200
+        return jsonify({'user': {'username': user.username}}), 200
 
     @app.route('/upload', methods=['POST'])
     @jwt_required()

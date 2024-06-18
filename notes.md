@@ -7,7 +7,8 @@ This solved the first 2 BASIC tasks
 
 Kept a check to make sure we show proper alerts on error while registering. Error handling as well 
 
-Logout functionality done
+Logout functionality:
+It was a simple process of simply resetting the token and redirecting the user to main page. 
 
 
 For Look at the APIService.ts file in the frontend services folder. Reimplement all network requests in the frontend to use this service, so that the app-version header is sent with every single request.
@@ -17,3 +18,6 @@ For Look at the APIService.ts file in the frontend services folder. Reimplement 
 Resources used so far:
 - StackOverflow
 - MUI (https://mui.com/) [Installation command: npm install @mui/material @emotion/react @emotion/styled @mui/icons-material]
+
+
+All the functionalities are implemented 
