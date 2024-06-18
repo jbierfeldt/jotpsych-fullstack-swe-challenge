@@ -32,13 +32,6 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    @app.after_request
-    def after_request(response):
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
-        return response
-
     @app.route('/')
     def index():
         return jsonify({'status': 200})

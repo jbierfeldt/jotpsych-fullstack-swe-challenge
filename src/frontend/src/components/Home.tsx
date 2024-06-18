@@ -15,7 +15,6 @@ function Home() {
 
   useEffect(() => {
     const fetchUser = async (token: string | null) => {
-      // get access token
       console.log(token);
       if (token) {
         const response = await fetch("http://localhost:3002/user", {
@@ -25,13 +24,13 @@ function Home() {
         });
         const data = await response.json();
         if (response.ok) {
-          setUsername(data.username);
+          setUsername(data.user.username);
         }
       }
       setLoading(false);
     };
 
-    fetchUser(localStorage.getItem('token'));
+    fetchUser(localStorage.getItem('token') || null);
   }, []);
 
   if (loading) {
@@ -51,6 +50,8 @@ function Home() {
         {username ? (
           <Typography variant="h5" align="center">
             Welcome, {username}!
+            <br/>
+            <Button variant="text" color="primary" onClick={() => window.location.href = '/userProfile'}>Profile Page</Button>
           </Typography>
         ) : (
           <Typography variant="h6" align="center">
