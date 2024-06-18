@@ -28,7 +28,7 @@ function Register() {
     }
   
     try {
-      const response = await APIService.request("/register", "POST", { username, password });
+      const response = await APIService.request("/register", "POST", { username, password }, false, true);
       setMessage(response.message);
       setIsSuccess(true);
       window.location.href = '/login';

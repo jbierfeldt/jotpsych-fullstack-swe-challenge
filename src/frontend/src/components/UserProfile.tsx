@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Container,
   Typography,
@@ -10,35 +10,74 @@ import {
 } from '@mui/material';
 import APIService from '../services/APIService';
 
-const UserProfile = () => {
+const UserProfile: React.FC = () => {
   const [motto, setMotto] = useState('My motto goes here!');
   const [username, setUsername] = useState<string>("");
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const audioChunks = useRef<Blob[]>([]);
   const theme = useTheme();
 
-  const handleNewMotto = () => {
-    const newMotto = prompt('Enter your new motto:', motto);
-    if (newMotto !== null && newMotto.trim() !== '') {
-      setMotto(newMotto);
-    }
-  };
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/';
-  };
   useEffect(() => {
     const fetchUser = async (token: string | null) => {
       if (token) {
         try {
-          const response = await APIService.request("/user", "GET", null, true);
+          const response = await APIService.request("/user", "GET", null, true, true);
           setUsername(response.user.username);
+          setMotto(response.user.motto || 'My motto goes here!');
         } catch (error) {
           console.error("Error fetching user");
         }
       }
     };
-  
+
     fetchUser(localStorage.getItem('token') || null);
   }, []);
+
+  const handleNewMotto = async () => {
+    if (recording) {
+      mediaRecorder?.stop();
+      setRecording(false);
+    } else {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
+
+      recorder.ondataavailable = (event) => {
+        audioChunks.current.push(event.data);
+      };
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'motto.webm');
+
+        try {
+          const response = await APIService.request('/upload', 'POST', formData, true, false);
+          setMotto(response.transcription);
+        } catch (error) {
+          console.error('Error uploading audio', error);
+        }
+        audioChunks.current = [];
+      };
+
+      recorder.start();
+      setRecording(true);
+
+      setTimeout(() => {
+        if (recording) {
+          recorder.stop();
+          setRecording(false);
+        }
+      }, 15000); // Stop recording after 15 seconds
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
+
   return (
     <Container maxWidth="sm">
       <Paper elevation={3} sx={{ padding: theme.spacing(4), marginTop: theme.spacing(4), textAlign: 'center' }}>
@@ -56,9 +95,9 @@ const UserProfile = () => {
         </Typography>
         <Box display="flex" justifyContent="space-around" mt={3}>
           <Button variant="contained" color="success" onClick={handleNewMotto}>
-            Record (New) Motto
+            {recording ? 'Stop Recording' : 'Record (New) Motto'}
           </Button>
-          <Button variant="contained" color="error" onClick={() => handleLogout()}>
+          <Button variant="contained" color="error" onClick={handleLogout}>
             Logout
           </Button>
         </Box>

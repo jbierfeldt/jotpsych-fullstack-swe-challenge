@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
-
 import os
+import whisper
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -17,13 +17,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'secret123'
     app.config['JWT_SECRET_KEY'] = 'secret1234'
 
-    CORS(
-        app,
-        resources={r"*": {"origins": "*"}},
-        allow_headers=["Authorization", "Content-Type", "app-version"],
-        methods=["GET", "POST", "OPTIONS"],
-        max_age=86400
-    )
+    CORS(app, resources={r"*": {"origins": "*"}}, allow_headers=["Authorization", "Content-Type", "app-version"], methods=["GET", "POST", "OPTIONS"], max_age=86400)
 
     db.init_app(app)
     bcrypt.init_app(app)
@@ -62,8 +56,7 @@ def create_app():
         data = request.get_json()
         user = User.query.filter_by(username=data['username']).first()
         if user and bcrypt.check_password_hash(user.password, data['password']):
-            access_token = create_access_token(
-                identity={'username': user.username})
+            access_token = create_access_token(identity={'username': user.username})
             return jsonify({'token': access_token}), 200
         return jsonify({'message': 'Invalid credentials'}), 401
 
@@ -71,16 +64,39 @@ def create_app():
     @jwt_required()
     def user():
         current_user = get_jwt_identity()
-        return jsonify({'user': current_user}), 200
+        user = User.query.filter_by(username=current_user['username']).first()
+        return jsonify({'user': {'username': user.username, 'motto': user.motto}}), 200
+
+    @app.route('/upload', methods=['POST'])
+    @jwt_required()
+    def upload():
+        if 'audio' not in request.files:
+            return jsonify({'message': 'No audio file'}), 400
+
+        audio = request.files['audio']
+        filename = os.path.join('uploads', audio.filename)
+        audio.save(filename)
+
+        # Mock transcription service
+        transcription = mock_transcription_service(filename)
+        
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(username=current_user['username']).first()
+        db.session.commit()
+
+        return jsonify({'transcription': transcription}), 200
+
+    def mock_transcription_service(filename):
+        model = whisper.load_model("base", device="cpu")
+        result = model.transcribe(filename, fp16=False)
+        return result['text']
 
     return app
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-
 
 if __name__ == '__main__':
     app = create_app()

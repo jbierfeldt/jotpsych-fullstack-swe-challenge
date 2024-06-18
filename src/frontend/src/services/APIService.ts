@@ -19,10 +19,10 @@ class APIService {
     endpoint: string,
     method: string,
     body?: any,
-    auth: boolean = false
+    auth: boolean = false,
+    isJson: boolean = true
   ): Promise<any> {
     const headers: HeadersInit = {
-      "Content-Type": "application/json",
       "app-version": this.appVersion,
     };
 
@@ -33,10 +33,15 @@ class APIService {
       }
     }
 
+    if (isJson) {
+      headers["Content-Type"] = "application/json";
+      body = body ? JSON.stringify(body) : null;
+    }
+
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : null,
+      body: body ? body : null,
     });
 
     if (!response.ok) {

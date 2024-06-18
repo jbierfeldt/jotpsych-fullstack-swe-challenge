@@ -22,7 +22,7 @@ function Login() {
     e.preventDefault();
   
     try {
-      const response = await APIService.request("/login", "POST", { username, password });
+      const response = await APIService.request("/login", "POST", { username, password }, false, true);
       console.log(response)
       if (response?.token) {
         localStorage.setItem('token', response.token);

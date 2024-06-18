@@ -17,7 +17,7 @@ function Home() {
     const fetchUser = async (token: string | null) => {
       if (token) {
         try {
-          const response = await APIService.request("/user", "GET", null, true);
+          const response = await APIService.request("/user", "GET", null, true, true);
           setUsername(response.user.username);
         } catch (error) {
           console.error("Error fetching user");
