@@ -9,7 +9,7 @@ import {
   Alert,
   useTheme
 } from "@mui/material";
-
+import APIService from '../services/APIService';
 
 function Login() {
   const [username, setUsername] = useState<string>("");
@@ -20,24 +20,26 @@ function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:3002/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      setMessage("Login successful");
-      setIsSuccess(true);
-      window.location.href = '/userProfile'; //Fastest way to do it
-    } else {
-      setMessage(data.message);
+  
+    try {
+      const response = await APIService.request("/login", "POST", { username, password });
+      console.log(response)
+      if (response?.token) {
+        localStorage.setItem('token', response.token);
+        setMessage("Login successful");
+        setIsSuccess(true);
+        window.location.href = '/userProfile'; // Redirect to '/userProfile'
+      } else {
+        setMessage(response.message);
+        setIsSuccess(false);
+      }
+    } catch (error) {
+      setMessage("Login failed");
+      console.log(error)
       setIsSuccess(false);
     }
   };
+  
 
   return (
     <>

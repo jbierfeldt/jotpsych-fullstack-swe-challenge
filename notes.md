@@ -9,6 +9,11 @@ Kept a check to make sure we show proper alerts on error while registering. Erro
 
 Logout functionality done
 
+
+For Look at the APIService.ts file in the frontend services folder. Reimplement all network requests in the frontend to use this service, so that the app-version header is sent with every single request.
+ - Refactored the APIService.ts with few adjustments based on changes made
+ -  refactor my existing network requests throughout my application to use APIService.request() method
+
 Resources used so far:
 - StackOverflow
 - MUI (https://mui.com/) [Installation command: npm install @mui/material @emotion/react @emotion/styled @mui/icons-material]

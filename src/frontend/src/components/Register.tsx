@@ -9,6 +9,7 @@ import {
   Alert,
   useTheme
 } from "@mui/material";
+import APIService from '../services/APIService';
 
 function Register() {
   const [username, setUsername] = useState<string>("");
@@ -19,22 +20,24 @@ function Register() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     if (!username || !password) {
       setMessage("Please enter required fields");
       setIsSuccess(false);
       return;
     }
-    const response = await fetch("http://localhost:3002/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
-    const data = await response.json();
-    setMessage(data.message);
-    setIsSuccess(response.ok);
+  
+    try {
+      const response = await APIService.request("/register", "POST", { username, password });
+      setMessage(response.message);
+      setIsSuccess(true);
+      window.location.href = '/login';
+    } catch (error) {
+      setMessage("Registration failed");
+      setIsSuccess(false);
+    }
   };
+  
 
   return (
     <Container maxWidth="sm">

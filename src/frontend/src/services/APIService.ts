@@ -27,7 +27,7 @@ class APIService {
     };
 
     if (auth) {
-      // get access token somehow
+      const token = localStorage.getItem('token');
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       }
@@ -47,4 +47,5 @@ class APIService {
   }
 }
 
-export default APIService.getInstance();
+const instance = APIService.getInstance();
+export default instance;

@@ -8,8 +8,9 @@ import {
   Avatar,
   useTheme
 } from '@mui/material';
+import APIService from '../services/APIService';
 
-const UserProfile: React.FC = () => {
+const UserProfile = () => {
   const [motto, setMotto] = useState('My motto goes here!');
   const [username, setUsername] = useState<string>("");
   const theme = useTheme();
@@ -26,20 +27,16 @@ const UserProfile: React.FC = () => {
   };
   useEffect(() => {
     const fetchUser = async (token: string | null) => {
-      console.log(token);
       if (token) {
-        const response = await fetch("http://localhost:3002/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setUsername(data.user.username);
+        try {
+          const response = await APIService.request("/user", "GET", null, true);
+          setUsername(response.user.username);
+        } catch (error) {
+          console.error("Error fetching user");
         }
       }
     };
-
+  
     fetchUser(localStorage.getItem('token') || null);
   }, []);
   return (

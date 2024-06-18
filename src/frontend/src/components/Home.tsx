@@ -8,30 +8,27 @@ import {
   CircularProgress,
   Paper
 } from "@mui/material";
-
+import APIService from '../services/APIService';
 function Home() {
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUser = async (token: string | null) => {
-      console.log(token);
       if (token) {
-        const response = await fetch("http://localhost:3002/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setUsername(data.user.username);
+        try {
+          const response = await APIService.request("/user", "GET", null, true);
+          setUsername(response.user.username);
+        } catch (error) {
+          console.error("Error fetching user");
         }
       }
       setLoading(false);
     };
-
+  
     fetchUser(localStorage.getItem('token') || null);
   }, []);
+  
 
   if (loading) {
     return (
