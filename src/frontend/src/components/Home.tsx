@@ -5,9 +5,9 @@ function Home() {
   const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUser = async (token: string) => {
       // get access token
-
+      console.log(token)
       if (token) {
         const response = await fetch("http://localhost:3002/user", {
           headers: {
@@ -21,7 +21,7 @@ function Home() {
       }
     };
 
-    fetchUser();
+    fetchUser(localStorage.getItem('token'));
   }, []);
 
   return (

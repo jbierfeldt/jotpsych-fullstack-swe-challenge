@@ -10,7 +10,6 @@ db = SQLAlchemy()
 bcrypt = Bcrypt()
 jwt = JWTManager()
 
-
 def create_app():
     app = Flask(__name__)
 
@@ -20,7 +19,7 @@ def create_app():
 
     CORS(
         app,
-        resources={r"*": {"origins": ["*"]}},
+        resources={r"*": {"origins": "*"}},
         allow_headers=["Authorization", "Content-Type"],
         methods=["GET", "POST", "OPTIONS"],
         max_age=86400
@@ -32,6 +31,13 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+        return response
 
     @app.route('/')
     def index():
@@ -61,7 +67,7 @@ def create_app():
     @jwt_required()
     def user():
         current_user = get_jwt_identity()
-        # return user information
+        return jsonify({'user': current_user}), 200
 
     return app
 

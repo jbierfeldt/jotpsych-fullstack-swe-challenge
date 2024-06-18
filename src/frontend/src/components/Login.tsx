@@ -16,8 +16,7 @@ function Login() {
     });
     const data = await response.json();
     if (response.ok) {
-      // do something with access token
-
+      localStorage.setItem('token', data.token);
       setMessage("Login successful");
     } else {
       setMessage(data.message);
